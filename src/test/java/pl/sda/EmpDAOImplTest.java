@@ -1,19 +1,15 @@
 package pl.sda;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.Work;
 import org.junit.Before;
 import org.junit.Test;
-import pl.sda.dao.DeptDAOImpl;
 import pl.sda.dao.EmpDAO;
 import pl.sda.dao.EmpDAOImpl;
 import pl.sda.domain.Employee;
-
+import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,20 +27,7 @@ public class EmpDAOImplTest {
     @Before
     public void init() throws IOException, ClassNotFoundException, SQLException {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-
-        try(Session session = factory.openSession()){
-            session.doWork(new Work() {
-                @Override
-                public void execute(Connection connection) throws SQLException {
-                    try {
-                        TestUtil.cleanUpDatabase(connection);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-        }
-
+        TestUtil.cleanUpDatabase(factory);
         empDAO = new EmpDAOImpl(factory);
     }
 
@@ -145,7 +128,7 @@ public class EmpDAOImplTest {
         assertEquals(employeeFromDB2.getDeptno(), newEmployee2.getDeptno());
     }
 
-    @Test(expected=SQLException.class)
+    @Test(expected=PersistenceException.class)
     public void createMultipleEmployeesSecondRowFail() throws Exception {
         Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), 20);
         Employee newEmployee2 = new Employee(9000, "JNOWAK", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10001), BigDecimal.valueOf(9.0), 30);

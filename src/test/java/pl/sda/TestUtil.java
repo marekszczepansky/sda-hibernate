@@ -1,5 +1,9 @@
 package pl.sda;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class TestUtil {
 
-    public static void cleanUpDatabase(Connection connection) throws IOException, SQLException {
+    private static void cleanUpDatabase(Connection connection) throws IOException, SQLException {
         InputStream inputStream = TestUtil.class.getClassLoader().getResourceAsStream("sda.sql");
         String sqlContent = new BufferedReader(new InputStreamReader(inputStream))
                 .lines().collect(Collectors.joining("\n"));
@@ -21,4 +25,18 @@ public class TestUtil {
         connection.createStatement().executeUpdate(sqlContent);
     }
 
+    public static void cleanUpDatabase(SessionFactory sessionFactory){
+        try(Session session = sessionFactory.openSession()){
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    try {
+                        TestUtil.cleanUpDatabase(connection);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+    }
 }

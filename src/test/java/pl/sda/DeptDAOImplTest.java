@@ -1,17 +1,15 @@
 package pl.sda;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.Work;
 import org.junit.Before;
 import org.junit.Test;
 import pl.sda.dao.DeptDAO;
 import pl.sda.dao.DeptDAOImpl;
 import pl.sda.domain.Department;
 
+import javax.persistence.PersistenceException;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,20 +25,7 @@ public class DeptDAOImplTest {
     @Before
     public void init() throws IOException, ClassNotFoundException, SQLException {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-
-        try(Session session = factory.openSession()){
-            session.doWork(new Work() {
-                @Override
-                public void execute(Connection connection) throws SQLException {
-                    try {
-                        TestUtil.cleanUpDatabase(connection);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-        }
-
+        TestUtil.cleanUpDatabase(factory);
         deptDAO = new DeptDAOImpl(factory);
 
     }
@@ -65,7 +50,13 @@ public class DeptDAOImplTest {
         assertEquals(department.getDeptno(), departmentFromDb.getDeptno());
         assertEquals(department.getDname(), departmentFromDb.getDname());
         assertEquals(department.getLocation(), departmentFromDb.getLocation());
+    }
 
+    @Test(expected=PersistenceException.class)
+    public void createDuplicatedDepartment() throws Exception {
+        Department department = new Department(99, "HR", "Las Vegas");
+        deptDAO.create(department);
+        deptDAO.create(department);
     }
 
     @Test
