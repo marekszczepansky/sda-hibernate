@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import pl.sda.dao.DeptDAO;
 import pl.sda.dao.DeptDAOImpl;
+import pl.sda.dao.DeptDAOJpaImpl;
 import pl.sda.domain.Department;
 
 import javax.persistence.PersistenceException;
