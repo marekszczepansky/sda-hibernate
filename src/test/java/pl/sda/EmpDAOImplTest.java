@@ -4,8 +4,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
+import pl.sda.dao.DeptDAO;
+import pl.sda.dao.DeptDAOImpl;
 import pl.sda.dao.EmpDAO;
 import pl.sda.dao.EmpDAOImpl;
+import pl.sda.domain.Department;
 import pl.sda.domain.Employee;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -23,12 +26,14 @@ import static org.junit.Assert.*;
 public class EmpDAOImplTest {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private EmpDAO empDAO;
+    private DeptDAO deptDAO;
 
     @Before
     public void init() throws IOException, ClassNotFoundException, SQLException {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
         TestUtil.cleanUpDatabase(factory);
         empDAO = new EmpDAOImpl(factory);
+        deptDAO = new DeptDAOImpl(factory);
     }
 
     @Test
@@ -36,26 +41,27 @@ public class EmpDAOImplTest {
         Employee employee = empDAO.findById(7369);
 
         assertNotNull(employee);
-        assertEquals(7369, employee.getDeptno());
+        assertEquals(20, employee.getDept().getDeptno());
         assertEquals("SMITH", employee.getEname());
         assertEquals("CLERK", employee.getJob());
         assertEquals(sdf.parse("1993-06-13"), employee.getHiredate());
         assertEquals(BigDecimal.valueOf(800), employee.getSalary());
-        assertEquals(BigDecimal.valueOf(0.0), employee.getCommision());
-        assertEquals(20, employee.getDeptno());
+        assertTrue(BigDecimal.valueOf(0.0).compareTo(employee.getCommision()) == 0);
 
     }
 
     @Test
     public void create() throws Exception {
-        Employee newEmployee = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), 20);
+        Department department = deptDAO.findById(20);
+
+        Employee newEmployee = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), department);
 
         empDAO.create(newEmployee);
 
         Employee employeeFromDB = empDAO.findById(9000);
 
         assertNotNull(employeeFromDB);
-        assertEquals(employeeFromDB.getEmpno(), newEmployee.getDeptno());
+        assertEquals(employeeFromDB.getEmpno(), newEmployee.getEmpno());
         assertEquals(employeeFromDB.getEname(), newEmployee.getEname());
         assertEquals(employeeFromDB.getJob(), newEmployee.getJob());
         assertEquals(employeeFromDB.getHiredate(), newEmployee.getHiredate());
@@ -94,8 +100,11 @@ public class EmpDAOImplTest {
 
     @Test
     public void createMultipleEmployeesAllOk() throws Exception {
-        Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), 20);
-        Employee newEmployee2 = new Employee(9001, "JNOWAK", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10001), BigDecimal.valueOf(9.0), 30);
+        Department department20 = deptDAO.findById(20);
+        Department department30 = deptDAO.findById(30);
+
+        Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), department20);
+        Employee newEmployee2 = new Employee(9001, "JNOWAK", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10001), BigDecimal.valueOf(9.0), department30);
 
         List<Employee> employeeList = new ArrayList<>();
         employeeList.add(newEmployee1);
@@ -123,8 +132,11 @@ public class EmpDAOImplTest {
 
     @Test(expected=PersistenceException.class)
     public void createMultipleEmployeesSecondRowFail() throws Exception {
-        Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), 20);
-        Employee newEmployee2 = new Employee(9000, "JNOWAK", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10001), BigDecimal.valueOf(9.0), 30);
+        Department department20 = deptDAO.findById(20);
+        Department department30 = deptDAO.findById(30);
+
+        Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), department20);
+        Employee newEmployee2 = new Employee(9000, "JNOWAK", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10001), BigDecimal.valueOf(9.0), department30);
 
         List<Employee> employeeList = new ArrayList<>();
         employeeList.add(newEmployee1);
@@ -143,7 +155,7 @@ public class EmpDAOImplTest {
     public void getTotalSalaryByDept() throws Exception {
         BigDecimal salaryFor10Dept = empDAO.getTotalSalaryByDept(10);
 
-        assertEquals(8750, salaryFor10Dept);
+        assertTrue(BigDecimal.valueOf(8750).compareTo(salaryFor10Dept) == 0);
     }
 
     @Test

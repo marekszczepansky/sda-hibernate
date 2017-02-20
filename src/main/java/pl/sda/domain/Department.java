@@ -21,16 +21,17 @@ public class Department {
     @Column(name = "location")
     private String location;
 
-    //@OneToMany(mappedBy = "dept")
-    //private List<Employee> employees;
+    @OneToMany(mappedBy = "dept")
+    private List<Employee> employees;
 
     public Department() {
     }
 
-    public Department(int deptno, String dname, String location) {
+    public Department(int deptno, String dname, String location, List<Employee> employees) {
         this.deptno = deptno;
         this.dname = dname;
         this.location = location;
+        this.employees = employees;
     }
 
     public int getDeptno() {
@@ -57,13 +58,13 @@ public class Department {
         this.location = location;
     }
 
-//    public List<Employee> getEmployees() {
-//        return employees;
-//    }
-//
-//    public void setEmployees(List<Employee> employees) {
-//        this.employees = employees;
-//    }
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
 
     @Override
     public boolean equals(Object o) {

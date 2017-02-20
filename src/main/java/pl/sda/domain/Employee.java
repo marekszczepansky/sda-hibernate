@@ -1,5 +1,6 @@
 package pl.sda.domain;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
@@ -7,21 +8,42 @@ import java.util.Objects;
 /**
  * Created by pzawa on 02.02.2017.
  */
+@Entity
+@Table(name = "Emp")
 public class Employee {
+
+    @Id
+    @Column(name = "empno")
     private int empno;
+
+    @Column(name = "ename")
     private String ename;
+
+    @Column(name = "job")
     private String job;
+
+    @Column(name = "manager")
     private Integer manager;
+
+    @Column(name = "hiredate")
+    @Temporal(TemporalType.DATE)
     private Date hiredate;
+
+    @Column(name = "salary")
     private BigDecimal salary;
+
+
+    @Column(name = "commision")
     private BigDecimal commision;
-    private int deptno;
+
+    @ManyToOne
+    @JoinColumn(name = "deptno")
     private Department dept;
 
     public Employee() {
     }
 
-    public Employee(int empno, String ename, String job, Integer manager, Date hiredate, BigDecimal salary, BigDecimal commision, int deptno) {
+    public Employee(int empno, String ename, String job, Integer manager, Date hiredate, BigDecimal salary, BigDecimal commision, Department department) {
         this.empno = empno;
         this.ename = ename;
         this.job = job;
@@ -29,7 +51,7 @@ public class Employee {
         this.hiredate = hiredate;
         this.salary = salary;
         this.commision = commision;
-        this.deptno = deptno;
+        this.dept = department;
     }
 
     public int getEmpno() {
@@ -89,12 +111,12 @@ public class Employee {
         this.commision = commision;
     }
 
-    public int getDeptno() {
-        return deptno;
+    public Department getDept() {
+        return dept;
     }
 
-    public void setDeptno(int deptno) {
-        this.deptno = deptno;
+    public void setDept(Department dept) {
+        this.dept = dept;
     }
 
     @Override
@@ -119,8 +141,6 @@ public class Employee {
                 ", manager='" + manager + '\'' +
                 ", hiredate=" + hiredate +
                 ", salary=" + salary +
-                ", commision=" + commision +
-                ", deptno=" + deptno +
-                '}';
+                ", commision=" + commision +'}';
     }
 }

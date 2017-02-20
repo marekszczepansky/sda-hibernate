@@ -37,7 +37,7 @@ public class DeptDAOImpl implements DeptDAO {
             session.persist(department);
             tx.commit();
         }catch(Exception ex){
-            if(tx != null){
+            if(tx != null && !tx.getRollbackOnly()){
                 tx.rollback();
             }
             throw ex;
@@ -52,7 +52,7 @@ public class DeptDAOImpl implements DeptDAO {
             session.update(department);
             tx.commit();
         }catch(Exception ex){
-            if(tx != null){
+            if(tx != null && !tx.getRollbackOnly()){
                 tx.rollback();
             }
             throw ex;
@@ -68,7 +68,7 @@ public class DeptDAOImpl implements DeptDAO {
             dept.setDname(dname);
             tx.commit();
         }catch(Exception ex){
-            if(tx != null){
+            if(tx != null && !tx.getRollbackOnly()){
                 tx.rollback();
             }
             throw ex;
@@ -84,7 +84,7 @@ public class DeptDAOImpl implements DeptDAO {
             session.delete(dept);
             tx.commit();
         }catch(Exception ex){
-            if(tx != null){
+            if(tx != null && !tx.getRollbackOnly()){
                 tx.rollback();
             }
             throw ex;

@@ -12,6 +12,7 @@ import pl.sda.domain.Department;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -42,7 +43,7 @@ public class DeptDAOImplTest {
 
     @Test
     public void create() throws Exception {
-        Department department = new Department(99, "HR", "Las Vegas");
+        Department department = new Department(99, "HR", "Las Vegas", new ArrayList<>());
         deptDAO.create(department);
 
         Department departmentFromDb = deptDAO.findById(99);
@@ -55,7 +56,7 @@ public class DeptDAOImplTest {
 
     @Test(expected=PersistenceException.class)
     public void createDuplicatedDepartment() throws Exception {
-        Department department = new Department(99, "HR", "Las Vegas");
+        Department department = new Department(99, "HR", "Las Vegas", new ArrayList<>());
         deptDAO.create(department);
         deptDAO.create(department);
     }
