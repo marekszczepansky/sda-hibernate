@@ -8,36 +8,23 @@ import java.util.Objects;
 /**
  * Created by pzawa on 02.02.2017.
  */
-@Entity
-@Table(name = "Emp")
+
 public class Employee {
 
-    @Id
-    @Column(name = "empno")
     private int empno;
 
-    @Column(name = "ename")
     private String ename;
 
-    @Column(name = "job")
     private String job;
 
-    @Column(name = "manager")
     private Integer manager;
 
-    @Column(name = "hiredate")
-    @Temporal(TemporalType.DATE)
     private Date hiredate;
 
-    @Column(name = "salary")
     private BigDecimal salary;
 
-
-    @Column(name = "commision")
     private BigDecimal commision;
 
-    @ManyToOne
-    @JoinColumn(name = "deptno")
     private Department dept;
 
     public Employee() {

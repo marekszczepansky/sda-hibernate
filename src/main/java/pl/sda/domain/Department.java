@@ -21,7 +21,8 @@ public class Department {
     @Column(name = "location")
     private String location;
 
-    @OneToMany(mappedBy = "dept")
+    //@OneToMany(mappedBy = "dept")
+    @Transient
     private List<Employee> employees;
 
     public Department() {
