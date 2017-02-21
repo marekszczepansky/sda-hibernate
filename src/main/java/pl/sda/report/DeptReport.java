@@ -41,7 +41,8 @@ public class DeptReport {
          }
     }
 
-    private static void displayDept(Department department){
-        System.out.println(department.getDeptno() + ":" + department.getDname() + ":" + department.getLocation());
+    private static Department getDepartmentFromDB(int deptId){
+        //TODO
+        return null;
     }
 }
