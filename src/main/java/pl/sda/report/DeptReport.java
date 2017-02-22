@@ -27,8 +27,6 @@ public class DeptReport {
 
     private static Department getDepartmentFromMock(int deptId){
         try {
-            //Stworzyc obiekt session factory
-            //
             List<Employee> employeeList = new ArrayList<Employee>();
             Department dept = new Department(deptId, "TEST", "TEST", employeeList);
             Employee newEmployee1 = new Employee(9000, "JKOWALSKI", "Manager", 7839, sdf.parse("2017-01-01"), BigDecimal.valueOf(10000), BigDecimal.valueOf(10.0), dept);
