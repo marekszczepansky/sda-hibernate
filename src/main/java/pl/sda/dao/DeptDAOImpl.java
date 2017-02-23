@@ -96,6 +96,7 @@ public class DeptDAOImpl implements DeptDAO {
         try(Session session = sessionFactory.openSession()) {
             Criteria cr = session.createCriteria(Department.class);
             cr.add(Restrictions.eq("dname", dname));
+            cr.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
             List departments = cr.list();
             return departments;
         }
