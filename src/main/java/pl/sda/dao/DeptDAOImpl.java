@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
+import org.hibernate.transform.ResultTransformer;
 import pl.sda.domain.Department;
 
 import java.io.Serializable;
@@ -96,6 +97,7 @@ public class DeptDAOImpl implements DeptDAO {
         try(Session session = sessionFactory.openSession()) {
             Criteria cr = session.createCriteria(Department.class);
             cr.add(Restrictions.eq("dname", dname));
+            cr.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
             List departments = cr.list();
             return departments;
         }
