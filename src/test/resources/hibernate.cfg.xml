@@ -23,11 +23,9 @@
         <property name="connection.autocommit">
             false
         </property>
-        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         <property name="hbm2ddl.auto">validate</property>
-        <!--<property name="hbm2ddl.auto">create</property>-->
-        <!--<property name="hbm2ddl.auto">update</property>-->
         <mapping class="pl.sda.domain.Department"/>
         <mapping class="pl.sda.domain.Employee"/>
     </session-factory>

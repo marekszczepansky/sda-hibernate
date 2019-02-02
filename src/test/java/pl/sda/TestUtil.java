@@ -25,8 +25,8 @@ public class TestUtil {
         connection.createStatement().executeUpdate(sqlContent);
     }
 
-    public static void cleanUpDatabase(SessionFactory sessionFactory){
-        try(Session session = sessionFactory.openSession()){
+    public static void cleanUpDatabase(SessionFactory sessionFactory) {
+        try (Session session = sessionFactory.openSession()) {
             session.doWork(new Work() {
                 @Override
                 public void execute(Connection connection) throws SQLException {

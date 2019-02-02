@@ -25,9 +25,9 @@ public class DeptDAOImplTest {
     private DeptDAO deptDAO;
 
     @Before
-    public void init() throws IOException, ClassNotFoundException, SQLException {
+    public void init() {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-        TestUtil.cleanUpDatabase(factory);
+//        TestUtil.cleanUpDatabase(factory);
         deptDAO = new DeptDAOImpl(factory);
 
     }

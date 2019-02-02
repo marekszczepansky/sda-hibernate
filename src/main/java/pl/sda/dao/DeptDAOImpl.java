@@ -22,7 +22,7 @@ public class DeptDAOImpl implements DeptDAO {
     }
 
     @Override
-    public Department findById(int id) throws Exception {
+    public Department findById(int id) {
         try(Session session = sessionFactory.openSession()) {
             return session.find(Department.class, id);
         }
@@ -30,7 +30,7 @@ public class DeptDAOImpl implements DeptDAO {
     }
 
     @Override
-    public void create(Department department) throws Exception {
+    public void create(Department department) {
         Transaction tx = null;
         try(Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
@@ -106,9 +106,9 @@ public class DeptDAOImpl implements DeptDAO {
     @Override
     public List<Department> findByLocation(String location) {
         try(Session session = sessionFactory.openSession()) {
-            Query query = session.createQuery("from Department where location = :location");
+            Query<Department> query = session.createQuery("from Department where location = :location", Department.class);
             query.setParameter("location", location);
-            List departments = query.list();
+            List<Department> departments = query.list();
             return  departments;
         }
     }
