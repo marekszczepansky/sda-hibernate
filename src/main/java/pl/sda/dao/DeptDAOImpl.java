@@ -106,9 +106,9 @@ public class DeptDAOImpl implements DeptDAO {
     @Override
     public List<Department> findByLocation(String location) {
         try(Session session = sessionFactory.openSession()) {
-            Query query = session.createQuery("from Department where location = :location");
+            Query<Department> query = session.createQuery("from Department where location = :location", Department.class);
             query.setParameter("location", location);
-            List departments = query.list();
+            List<Department> departments = query.list();
             return  departments;
         }
     }

@@ -6,12 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import pl.sda.dao.DeptDAO;
 import pl.sda.dao.DeptDAOImpl;
-import pl.sda.dao.DeptDAOJpaImpl;
 import pl.sda.domain.Department;
 
 import javax.persistence.PersistenceException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +22,9 @@ public class DeptDAOImplTest {
     private DeptDAO deptDAO;
 
     @Before
-    public void init() throws IOException, ClassNotFoundException, SQLException {
+    public void init() {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-        TestUtil.cleanUpDatabase(factory);
+//        TestUtil.cleanUpDatabase(factory);
         deptDAO = new DeptDAOImpl(factory);
 
     }

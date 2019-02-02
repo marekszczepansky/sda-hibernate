@@ -10,10 +10,9 @@ import pl.sda.dao.EmpDAO;
 import pl.sda.dao.EmpDAOImpl;
 import pl.sda.domain.Department;
 import pl.sda.domain.Employee;
+
 import javax.persistence.PersistenceException;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +28,9 @@ public class EmpDAOImplTest {
     private DeptDAO deptDAO;
 
     @Before
-    public void init() throws IOException, ClassNotFoundException, SQLException {
+    public void init() {
         SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-        TestUtil.cleanUpDatabase(factory);
+//        TestUtil.cleanUpDatabase(factory);
         empDAO = new EmpDAOImpl(factory);
         deptDAO = new DeptDAOImpl(factory);
     }
@@ -64,7 +63,7 @@ public class EmpDAOImplTest {
         assertEquals(employeeFromDB.getEmpno(), newEmployee.getEmpno());
         assertEquals(employeeFromDB.getEname(), newEmployee.getEname());
         assertEquals(employeeFromDB.getJob(), newEmployee.getJob());
-        assertEquals(employeeFromDB.getHiredate(), newEmployee.getHiredate());
+        assertEquals(employeeFromDB.getHiredate().getTime(),newEmployee.getHiredate().getTime());
         assertTrue(employeeFromDB.getSalary().compareTo(newEmployee.getSalary()) == 0);
         assertTrue(employeeFromDB.getCommision().compareTo(newEmployee.getCommision()) == 0);
     }
@@ -118,14 +117,14 @@ public class EmpDAOImplTest {
         assertNotNull(employeeFromDB1);
         assertEquals(employeeFromDB1.getEname(), newEmployee1.getEname());
         assertEquals(employeeFromDB1.getJob(), newEmployee1.getJob());
-        assertEquals(employeeFromDB1.getHiredate(), newEmployee1.getHiredate());
+        assertEquals(employeeFromDB1.getHiredate().getTime(), newEmployee1.getHiredate().getTime());
         assertTrue(employeeFromDB1.getSalary().compareTo(newEmployee1.getSalary()) == 0);
         assertTrue(employeeFromDB1.getCommision().compareTo(newEmployee1.getCommision()) == 0);
 
         assertNotNull(employeeFromDB2);
         assertEquals(employeeFromDB2.getEname(), newEmployee2.getEname());
         assertEquals(employeeFromDB2.getJob(), newEmployee2.getJob());
-        assertEquals(employeeFromDB2.getHiredate(), newEmployee2.getHiredate());
+        assertEquals(employeeFromDB2.getHiredate().getTime(), newEmployee2.getHiredate().getTime());
         assertTrue(employeeFromDB2.getSalary().compareTo(newEmployee2.getSalary()) == 0);
         assertTrue(employeeFromDB2.getCommision().compareTo(newEmployee2.getCommision()) == 0);
     }
