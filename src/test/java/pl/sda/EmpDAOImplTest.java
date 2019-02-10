@@ -44,7 +44,7 @@ public class EmpDAOImplTest {
         assertEquals("SMITH", employee.getEname());
         assertEquals("CLERK", employee.getJob());
         assertEquals(sdf.parse("1993-06-13"), employee.getHiredate());
-        assertEquals(BigDecimal.valueOf(800), employee.getSalary());
+        assertEquals(BigDecimal.valueOf(80000, 2), employee.getSalary());
         assertTrue(BigDecimal.valueOf(0.0).compareTo(employee.getCommision()) == 0);
 
     }
