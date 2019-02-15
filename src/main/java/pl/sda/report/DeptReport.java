@@ -20,6 +20,7 @@ public class DeptReport {
     private static SessionFactory factory;
 
     public static void main(String[] args) {
+        // TODO: use JPA here
         factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
         Department department = getDepartmentFromDB(10);
         System.out.println(department.getDeptno() + ":" + department.getDname() + ":" + department.getLocation());

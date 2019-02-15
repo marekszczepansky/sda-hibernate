@@ -1,8 +1,9 @@
 package pl.sda.dao;
 
-import org.hibernate.SessionFactory;
 import pl.sda.domain.Department;
+
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -15,15 +16,15 @@ import java.util.List;
  * Created by pzawa on 02.02.2017.
  */
 public class DeptDAOJpaImpl implements DeptDAO {
-    private final SessionFactory sessionFactory;
+    private final EntityManagerFactory emf;
 
-    public DeptDAOJpaImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public DeptDAOJpaImpl(EntityManagerFactory em) {
+        this.emf = em;
     }
 
     @Override
-    public Department findById(int id) throws Exception {
-        EntityManager em = sessionFactory.createEntityManager();
+    public Department findById(int id) {
+        EntityManager em = emf.createEntityManager();
         try{
             return em.find(Department.class, id);
         }finally {
@@ -32,8 +33,8 @@ public class DeptDAOJpaImpl implements DeptDAO {
     }
 
     @Override
-    public void create(Department department) throws Exception {
-        EntityManager em = sessionFactory.createEntityManager();
+    public void create(Department department) {
+        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
         try{
             tx = em.getTransaction();
@@ -51,8 +52,8 @@ public class DeptDAOJpaImpl implements DeptDAO {
     }
 
     @Override
-    public void update(Department department) throws Exception {
-        EntityManager em = sessionFactory.createEntityManager();
+    public void update(Department department) {
+        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
         try{
             tx = em.getTransaction();
@@ -70,8 +71,8 @@ public class DeptDAOJpaImpl implements DeptDAO {
     }
 
     @Override
-    public void updateName(int id, String dname) throws Exception {
-        EntityManager em = sessionFactory.createEntityManager();
+    public void updateName(int id, String dname) {
+        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
         try{
             tx = em.getTransaction();
@@ -90,8 +91,8 @@ public class DeptDAOJpaImpl implements DeptDAO {
     }
 
     @Override
-    public void delete(int id) throws Exception {
-        EntityManager em = sessionFactory.createEntityManager();
+    public void delete(int id) {
+        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
         try{
             tx = em.getTransaction();
@@ -111,7 +112,7 @@ public class DeptDAOJpaImpl implements DeptDAO {
 
     @Override
     public List<Department> findByName(String dname) {
-        EntityManager em = sessionFactory.createEntityManager();
+        EntityManager em = emf.createEntityManager();
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Department> q = cb.createQuery(Department.class);
@@ -130,7 +131,7 @@ public class DeptDAOJpaImpl implements DeptDAO {
 
     @Override
     public List<Department> findByLocation(String location) {
-        EntityManager em = sessionFactory.createEntityManager();
+        EntityManager em = emf.createEntityManager();
         try{
             TypedQuery<Department> query = em.createQuery("SELECT d FROM Department d WHERE d.location = :location", Department.class);
             query.setParameter("location", location);
