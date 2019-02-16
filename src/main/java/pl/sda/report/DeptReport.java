@@ -1,11 +1,11 @@
 package pl.sda.report;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import pl.sda.dao.DeptDAOImpl;
+import pl.sda.dao.DeptDAOJpaImpl;
 import pl.sda.domain.Department;
 import pl.sda.domain.Employee;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,11 +17,10 @@ import java.util.List;
  */
 public class DeptReport {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    private static SessionFactory factory;
+    private static EntityManagerFactory factory;
 
     public static void main(String[] args) {
-        // TODO: use JPA here
-        factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+        factory = Persistence.createEntityManagerFactory("PU");
         Department department = getDepartmentFromDB(10);
         System.out.println(department.getDeptno() + ":" + department.getDname() + ":" + department.getLocation());
         for (Employee employee : department.getEmployees()) {
@@ -45,7 +44,7 @@ public class DeptReport {
     }
 
     private static Department getDepartmentFromDB(int deptId) {
-        DeptDAOImpl deptDAO = new DeptDAOImpl(factory);
+        DeptDAOJpaImpl deptDAO = new DeptDAOJpaImpl(factory);
 
         return deptDAO.findById(deptId);
     }

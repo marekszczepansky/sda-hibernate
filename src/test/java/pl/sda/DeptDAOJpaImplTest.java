@@ -6,7 +6,6 @@ import pl.sda.dao.DeptDAO;
 import pl.sda.dao.DeptDAOJpaImpl;
 import pl.sda.domain.Department;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
@@ -25,7 +24,6 @@ public class DeptDAOJpaImplTest {
     @Before
     public void init() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
-        EntityManager em = emf.createEntityManager();
 //        TestUtil.cleanUpDatabase(factory);
         deptDAO = new DeptDAOJpaImpl(emf);
 
