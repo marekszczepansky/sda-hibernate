@@ -19,11 +19,9 @@ public class DeptReport {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SessionFactory factory;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-//        Department department = getDepartmentFromDB(10);
-// TODO: replace mock with database data
-        Department department = getDepartmentFromMock(10);
+        Department department = getDepartmentFromDB(10);
         System.out.println(department.getDeptno() + ":" + department.getDname() + ":" + department.getLocation());
         for (Employee employee : department.getEmployees()) {
             System.out.println("       " + employee.getEmpno() + ":" + employee.getEname() + ":" + employee.getJob() + ":" + employee.getSalary());
@@ -45,7 +43,7 @@ public class DeptReport {
         }
     }
 
-    private static Department getDepartmentFromDB(int deptId) throws Exception {
+    private static Department getDepartmentFromDB(int deptId) {
         DeptDAOImpl deptDAO = new DeptDAOImpl(factory);
 
         return deptDAO.findById(deptId);
