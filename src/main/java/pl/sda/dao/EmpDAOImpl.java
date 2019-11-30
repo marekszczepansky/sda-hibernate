@@ -10,6 +10,7 @@ import pl.sda.domain.Employee;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by pzawa on 02.02.2017.
@@ -21,6 +22,20 @@ public class EmpDAOImpl implements EmpDAO {
         this.sessionFactory = sessionFactory;
     }
 
+    public void doInTransaction(Consumer<Session> work) {
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            work.accept(session);
+            tx.commit();
+        } catch (Exception ex) {
+            if (tx != null && !tx.getRollbackOnly()) {
+                tx.rollback();
+            }
+            throw ex;
+        }
+    }
+
     @Override
     public Employee findById(int id) throws Exception {
         try (Session session = sessionFactory.openSession()) {
@@ -30,18 +45,7 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public void create(Employee employee) throws Exception {
-        Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
-            tx = session.beginTransaction();
-            session.persist(employee);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null && !tx.getRollbackOnly()) {
-                tx.rollback();
-            }
-            throw ex;
-        }
-
+        doInTransaction(session -> session.persist(employee));
     }
 
     @Override
@@ -105,7 +109,7 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public List<Employee> getEmployeesByDept(int deptNo) {
-        try(Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             Criteria cr = session.createCriteria(Employee.class);
             cr.add(Restrictions.eq("dept.deptno", deptNo));
             cr.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
@@ -115,7 +119,7 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public List<Employee> getEmployeeByName(String ename) {
-        try(Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             Query<Employee> query = session.createQuery("from Employee where ename = :ename", Employee.class);
             query.setParameter("ename", ename);
             return query.list();
