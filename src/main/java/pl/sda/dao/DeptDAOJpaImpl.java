@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by pzawa on 02.02.2017.
@@ -25,9 +26,9 @@ public class DeptDAOJpaImpl implements DeptDAO {
     @Override
     public Department findById(int id) {
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             return em.find(Department.class, id);
-        }finally {
+        } finally {
             em.close();
         }
     }
@@ -36,17 +37,17 @@ public class DeptDAOJpaImpl implements DeptDAO {
     public void create(Department department) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
-        try{
+        try {
             tx = em.getTransaction();
             tx.begin();
             em.persist(department);
             tx.commit();
-        }catch(Exception ex){
-            if(tx != null && tx.isActive()){
+        } catch (Exception ex) {
+            if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
             throw ex;
-        }finally {
+        } finally {
             em.close();
         }
     }
@@ -55,57 +56,64 @@ public class DeptDAOJpaImpl implements DeptDAO {
     public void update(Department department) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
-        try{
+        try {
             tx = em.getTransaction();
             tx.begin();
             em.merge(department);
             tx.commit();
-        }catch(Exception ex){
-            if(tx != null && tx.isActive()){
+        } catch (Exception ex) {
+            if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
             throw ex;
-        }finally {
+        } finally {
+            em.close();
+        }
+    }
+
+    private void doInTransaction(Consumer<EntityManager> job) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = null;
+        try {
+            tx = em.getTransaction();
+            tx.begin();
+            job.accept(em);
+            tx.commit();
+        } catch (Exception ex) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            throw ex;
+        } finally {
             em.close();
         }
     }
 
     @Override
     public void updateName(int id, String dname) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = null;
-        try{
-            tx = em.getTransaction();
-            tx.begin();
+        doInTransaction(em -> {
             Department dept = em.find(Department.class, id);
             dept.setDname(dname);
-            tx.commit();
-        }catch(Exception ex){
-            if(tx != null && tx.isActive()){
-                tx.rollback();
-            }
-            throw ex;
-        }finally {
-            em.close();
-        }
+        });
+
     }
 
     @Override
     public void delete(int id) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
-        try{
+        try {
             tx = em.getTransaction();
             tx.begin();
             Department dept = em.find(Department.class, id);
             em.remove(dept);
             tx.commit();
-        }catch(Exception ex){
-            if(tx != null && tx.isActive()){
+        } catch (Exception ex) {
+            if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
             throw ex;
-        }finally {
+        } finally {
             em.close();
         }
     }
@@ -113,7 +121,7 @@ public class DeptDAOJpaImpl implements DeptDAO {
     @Override
     public List<Department> findByName(String dname) {
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Department> q = cb.createQuery(Department.class);
             Root<Department> c = q.from(Department.class);
@@ -124,7 +132,7 @@ public class DeptDAOJpaImpl implements DeptDAO {
             query.setParameter(p, dname);
             List<Department> departments = query.getResultList();
             return departments;
-        }finally {
+        } finally {
             em.close();
         }
     }
@@ -132,12 +140,12 @@ public class DeptDAOJpaImpl implements DeptDAO {
     @Override
     public List<Department> findByLocation(String location) {
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             TypedQuery<Department> query = em.createQuery("SELECT d FROM Department d WHERE d.location = :location", Department.class);
             query.setParameter("location", location);
             List<Department> departments = query.getResultList();
             return departments;
-        }finally {
+        } finally {
             em.close();
         }
     }
