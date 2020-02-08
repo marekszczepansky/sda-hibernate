@@ -12,64 +12,13 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by pzawa on 02.02.2017.
  */
 public class DeptDAOJpaImpl implements DeptDAO {
     private final EntityManagerFactory emf;
-
-    public DeptDAOJpaImpl(EntityManagerFactory em) {
-        this.emf = em;
-    }
-
-    @Override
-    public Department findById(int id) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            return em.find(Department.class, id);
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public void create(Department department) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-            em.persist(department);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw ex;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override
-    public void update(Department department) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-            em.merge(department);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw ex;
-        } finally {
-            em.close();
-        }
-    }
 
     private void doInTransaction(Consumer<EntityManager> job) {
         EntityManager em = emf.createEntityManager();
@@ -89,39 +38,53 @@ public class DeptDAOJpaImpl implements DeptDAO {
         }
     }
 
+    private <R> R getWithoutTransaction(Function<EntityManager, R> job) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return job.apply(em);
+        } finally {
+            em.close();
+        }
+    }
+
+    public DeptDAOJpaImpl(EntityManagerFactory em) {
+        this.emf = em;
+    }
+
+    @Override
+    public Department findById(int id) {
+        return getWithoutTransaction(em ->em.find(Department.class, id));
+    }
+
+    @Override
+    public void create(Department department) {
+        doInTransaction(em -> em.persist(department));
+    }
+
+    @Override
+    public void update(Department department) {
+        doInTransaction(em -> em.merge(department));
+    }
+
     @Override
     public void updateName(int id, String dname) {
         doInTransaction(em -> {
             Department dept = em.find(Department.class, id);
             dept.setDname(dname);
         });
-
     }
 
     @Override
     public void delete(int id) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
+        doInTransaction(em -> {
             Department dept = em.find(Department.class, id);
             em.remove(dept);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw ex;
-        } finally {
-            em.close();
-        }
+        });
     }
 
     @Override
     public List<Department> findByName(String dname) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        return getWithoutTransaction(em -> {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Department> q = cb.createQuery(Department.class);
             Root<Department> c = q.from(Department.class);
@@ -132,22 +95,17 @@ public class DeptDAOJpaImpl implements DeptDAO {
             query.setParameter(p, dname);
             List<Department> departments = query.getResultList();
             return departments;
-        } finally {
-            em.close();
-        }
+        });
     }
 
     @Override
     public List<Department> findByLocation(String location) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        return getWithoutTransaction(em -> {
             TypedQuery<Department> query = em.createQuery("SELECT d FROM Department d WHERE d.location = :location", Department.class);
             query.setParameter("location", location);
             List<Department> departments = query.getResultList();
             return departments;
-        } finally {
-            em.close();
-        }
+        });
     }
 
 //    Constuctor Query - does not return jpa entity
