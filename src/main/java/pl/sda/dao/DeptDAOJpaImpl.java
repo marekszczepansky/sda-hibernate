@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by pzawa on 02.02.2017.
@@ -70,15 +71,13 @@ public class DeptDAOJpaImpl implements DeptDAO {
         }
     }
 
-    @Override
-    public void updateName(int id, String dname) {
+    private void doInTransaction(Consumer<EntityManager> job) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = null;
         try {
             tx = em.getTransaction();
             tx.begin();
-            Department dept = em.find(Department.class, id);
-            dept.setDname(dname);
+            job.accept(em);
             tx.commit();
         } catch (Exception ex) {
             if (tx != null && tx.isActive()) {
@@ -88,6 +87,15 @@ public class DeptDAOJpaImpl implements DeptDAO {
         } finally {
             em.close();
         }
+    }
+
+    @Override
+    public void updateName(int id, String dname) {
+        doInTransaction(em -> {
+            Department dept = em.find(Department.class, id);
+            dept.setDname(dname);
+        });
+
     }
 
     @Override
