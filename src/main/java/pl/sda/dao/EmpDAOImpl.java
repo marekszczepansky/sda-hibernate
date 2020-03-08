@@ -58,8 +58,18 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public void delete(int id) throws Exception {
-        // TODO: implement method
-
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            Employee employee = session.find(Employee.class, id);
+            session.delete(employee);
+            tx.commit();
+        } catch (Exception ex) {
+            if (tx != null && !tx.getRollbackOnly()) {
+                tx.rollback();
+            }
+            throw ex;
+        }
     }
 
     @Override
