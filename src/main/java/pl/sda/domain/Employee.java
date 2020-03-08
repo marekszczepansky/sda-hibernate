@@ -9,8 +9,11 @@ import java.util.Objects;
  * Created by pzawa on 02.02.2017.
  */
 
+@Entity
+@Table(name = "Emp")
 public class Employee {
 
+    @Id
     private int empno;
 
     private String ename;
@@ -25,6 +28,8 @@ public class Employee {
 
     private BigDecimal commision;
 
+    @ManyToOne
+    @JoinColumn(name = "deptno")
     private Department dept;
 
     public Employee() {
