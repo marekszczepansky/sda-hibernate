@@ -1,8 +1,11 @@
 package pl.sda.dao;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import pl.sda.domain.Employee;
 
 import java.math.BigDecimal;
@@ -15,8 +18,7 @@ import java.util.function.Consumer;
 public class EmpDAOImpl implements EmpDAO {
     private final SessionFactory sessionFactory;
 
-    public EmpDAOImpl(SessionFactory sessionFactory)
-    {
+    public EmpDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -90,19 +92,30 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public BigDecimal getTotalSalaryByDept(int dept) throws Exception {
-        // TODO: implement method
-        return null;
+        try (Session session = sessionFactory.openSession()) {
+            Query<BigDecimal> query = session.createQuery(
+                    "select sum(e.salary) from Employee e where dept.deptno = :dept", BigDecimal.class);
+            query.setParameter("dept", dept);
+            return query.getSingleResult();
+        }
     }
 
     @Override
     public List<Employee> getEmployeesByDept(int deptNo) {
-        // TODO: implement method
-        return null;
+        try (Session session = sessionFactory.openSession()) {
+            Query<Employee> query = session.createQuery(
+                    "select e from Employee e where dept.deptno = :dept", Employee.class);
+            query.setParameter("dept", deptNo);
+            return query.list();
+        }
     }
 
     @Override
     public List<Employee> getEmployeeByName(String ename) {
-        // TODO: implement method
-        return null;
+        try(Session session = sessionFactory.openSession()) {
+            Query<Employee> query = session.createQuery("from Employee where ename = :ename", Employee.class);
+            query.setParameter("ename", ename);
+            return query.list();
+        }
     }
 }
