@@ -11,6 +11,7 @@ import pl.sda.domain.Employee;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by pzawa on 02.02.2017.
@@ -31,17 +32,7 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public void create(Employee employee) throws Exception {
-        Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
-            tx = session.beginTransaction();
-            session.persist(employee);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null && !tx.getRollbackOnly()) {
-                tx.rollback();
-            }
-            throw ex;
-        }
+        doInTransaction(session -> session.persist(employee));
     }
 
     @Override
@@ -112,10 +103,31 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public List<Employee> getEmployeeByName(String ename) {
-        try(Session session = sessionFactory.openSession()) {
+        return doWithSession(session -> {
             Query<Employee> query = session.createQuery("from Employee where ename = :ename", Employee.class);
             query.setParameter("ename", ename);
             return query.list();
+        });
+    }
+
+    void doInTransaction( Consumer<Session> sessionConsumer){
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            // work to do
+            sessionConsumer.accept(session);
+            tx.commit();
+        } catch (Exception ex) {
+            if (tx != null && !tx.getRollbackOnly()) {
+                tx.rollback();
+            }
+            throw ex;
+        }
+    }
+
+    <K> K doWithSession(Function<Session, K> sessionKFunction) {
+        try(Session session = sessionFactory.openSession()) {
+            return sessionKFunction.apply(session);
         }
     }
 }
