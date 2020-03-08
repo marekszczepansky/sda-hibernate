@@ -7,6 +7,7 @@ import pl.sda.domain.Employee;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by pzawa on 02.02.2017.
@@ -74,8 +75,17 @@ public class EmpDAOImpl implements EmpDAO {
 
     @Override
     public void create(List<Employee> employees) throws Exception {
-        // TODO: implement method - create all entities in ine transaction (all on nothing)
-
+        Transaction tx = null;
+        try (Session session = sessionFactory.openSession()) {
+            tx = session.beginTransaction();
+            employees.forEach(session::persist);
+            tx.commit();
+        } catch (Exception ex) {
+            if (tx != null && !tx.getRollbackOnly()) {
+                tx.rollback();
+            }
+            throw ex;
+        }
     }
 
     @Override
